@@ -1,0 +1,7 @@
+
+
+void motor_init()
+{
+    //
+}
+

@@ -14,17 +14,18 @@ void button_init()
     BUTTON_DDR &= ~(1 << BUTTON_UP);
     
     //enable pull ups
-    BUTTON_PORT |= (1 << BUTTON_DOWN);
-    BUTTON_PORT |= (1 << BUTTON_UP);
+    BUTTON_PORT |= (1 << BUTTON_DOWN) | (1 << BUTTON_UP);
 }
 
 int button_up()
 {
+    //return status of speed up button
     return ~BUTTON_PIN & (1 << BUTTON_UP);
 }
 
 int button_down()
 {
+    // return status of slow down button
     return ~BUTTON_PIN & (1 << BUTTON_DOWN);
 }
 

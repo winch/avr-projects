@@ -11,7 +11,7 @@ hex: main
 	avr-objcopy -O ihex -R .flash $< $<.hex
 
 upload: hex
-	sudo avrdude -c usbtiny -p t2313 -U flash:w:main.hex:i
+	avrdude -c usbtiny -p t2313 -U flash:w:main.hex:i
 
 .PHONY: clean
 clean:

@@ -7,6 +7,10 @@ LDLIBS = -Os -mmcu=atmega168
 
 main: main.o display.o
 
+main.o: display.h
+
+display.o: display_values.h
+
 hex: main
 	avr-objcopy -O ihex -R .flash $< $<.hex
 

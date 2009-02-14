@@ -1,6 +1,9 @@
 
 #include <avr/io.h>
+#include <avr/interrupt.h>
 #include <util/delay.h>
+
+#include "display_values.h"
 
 #define DISPLAY_PORT PORTB
 #define DISPLAY_DDR DDRB
@@ -19,7 +22,6 @@ static int a_data;
 //data to output when pin 2 is sinking
 static int b_data;
 
-
 void display_init()
 {
     //set pins as outputs
@@ -27,10 +29,17 @@ void display_init()
     DISPLAY_PORT &= ~(1 << DISPLAY_OE);
     DISPLAY_PORT |= (1 << DISPLAY_LA);
     
-    //turn on pin 12
-    a_data = 0x100;
-    //turn on pin 10
-    b_data = 0x200;
+    //setup timer clock source cs/32
+    TCCR2B |= (1 << CS20) | (1 << CS21);
+    
+    //inable timer overflow interupt
+    TIMSK2 |= (1 << TOIE2);
+    
+    //enable global interupts
+    sei();
+    
+    a_data = 0x0;
+    b_data = 0x0;
 }
 
 static void display_toggle()
@@ -51,9 +60,19 @@ static void display_toggle()
     }
 }
 
+ISR(TIMER2_OVF_vect)
+{
+    display_toggle();
+}
+
 void display_set(char a, char b, char c, char d)
 {
-    //
+    a_data = a_values[a][0] | a_values[b][0] | a_values[c][0] | a_values[d][0];
+    a_data = b_values[a][0] | b_values[b][0] | b_values[c][0] | b_values[d][0];
+    
+    //clear sinking pins
+    a_data &= 0x3fff;
+    b_data &= 0x3fff;
 }
 
 static void display_write(int data)
@@ -82,10 +101,12 @@ static void display_write(int data)
 
 void display_test()
 {
-    //turn on all segments for 250ms
+    //turn on all segments for 1 sec
+    cli();
     display_write(0x3fff);
     _delay_ms(1000);
     display_clear();
+    sei();
 }
 
 static void display_clear()

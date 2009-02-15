@@ -49,13 +49,13 @@ static void display_toggle()
     if (set == 0)
     {
         //display a data
-        display_write(0x8000 | a_data);
+        display_write(0x4000 | a_data);
         set = 1;
     }
     else
     {
         //display b data
-        display_write(0x4000 | b_data);
+        display_write(0x8000 | b_data);
         set = 0;
     }
 }
@@ -67,8 +67,11 @@ ISR(TIMER2_OVF_vect)
 
 void display_set(char a, char b, char c, char d)
 {
-    a_data = a_values[a][0] | a_values[b][0] | a_values[c][0] | a_values[d][0];
-    a_data = b_values[a][0] | b_values[b][0] | b_values[c][0] | b_values[d][0];
+    a_data = a_values[a][0] | a_values[b][1] | a_values[c][2] | a_values[d][3];
+    b_data = b_values[a][0] | b_values[b][1] | b_values[c][2] | b_values[d][3];
+    
+    //turn on colon
+    a_data |= 0x1;
     
     //clear sinking pins
     a_data &= 0x3fff;

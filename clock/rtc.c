@@ -1,6 +1,5 @@
 
-#include <avr/io.h>
-#include <util/twi.h>
+#include <inttypes.h>
 
 #include "rtc.h"
 #include "twi.h"
@@ -32,16 +31,18 @@ void rtc_read(struct rtc_time *time)
     data = twi_read(more);
 
     //read minutes
-    data = twi_read(more);
-        
+    data = twi_read(more);  
     time->minute = ((data >> 4) * 10) + (data & 0xf);
     
     //read hours
     data = twi_read(finished);
-	
-	time->hour = data & 0xf;
+    time->hour = data & 0xf;
 
     twi_stop();    
 }
 
+void rtc_write(struct rtc_time *time)
+{
+    //
+}
 

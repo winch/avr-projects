@@ -12,5 +12,7 @@ void rtc_init(struct rtc_time *time);
 
 void rtc_read(struct rtc_time *time);
 
+void rtc_write(struct rtc_time *time);
+
 #endif
 

@@ -3,20 +3,14 @@
 #include <util/twi.h>
 
 #include "rtc.h"
+#include "twi.h"
 
 //rtc chip address
 #define DS3231 0x68
 
 void rtc_init(struct rtc_time *time)
 {
-    //inable pull up resistors on i2c pins
-    DDRC &= ~(1 << PC4);
-    DDRC &= ~(1 << PC5);
-    PORTC |= (1 << PC4) | (1 << PC5);
-    
-    //twi clock
-    TWSR = 0;
-    TWBR = 10;
+    twi_init();
     
     //time
     time->hour = 7;
@@ -25,68 +19,29 @@ void rtc_init(struct rtc_time *time)
 
 void rtc_read(struct rtc_time *time)
 {
-    //transmit start condition
-    TWCR = (1 << TWINT) | (1 <<TWSTA) | (1 <<TWEN);
-    while ((TWCR & (1 << TWINT)) == 0) ;
-    if (TW_STATUS != TW_START)
-        ;//return 1;
+    uint8_t data;
+    //write memory location to read from
+    twi_start_write(DS3231);
+    twi_write(0);
+    twi_stop();
     
-    //sla + w
-    TWDR = (DS3231 << 1) | TW_WRITE;
-    //start transmission
-    TWCR = (1 << TWINT) | (1 << TWEN);
-    while ((TWCR & (1 << TWINT)) == 0) ;
-    if (TW_STATUS == TW_MR_DATA_ACK)
-        ;//return 2;
-    
-    //write address 0
-    TWDR = 0;
-    //start transmission
-    TWCR = (1 << TWINT) | (1 << TWEN);
-    while ((TWCR & (1 << TWINT)) == 0) ;
-    if (TW_STATUS != TW_MT_DATA_NACK)
-        ;//return 3;
+    //read from rtc
+    twi_start_read(DS3231);
 
-    //stop
-    TWCR = (1 << TWINT) | (1 << TWSTO) | (1 <<TWEN);
-    while ((TWCR & (1 << TWSTO)) == 0) ;
-
-
-    //transmit start condition
-    TWCR = (1 << TWINT) | (1 <<TWSTA) | (1 <<TWEN);
-    while ((TWCR & (1 << TWINT)) == 0) ;
-    if (TW_STATUS != TW_START)
-        ;//return 1;
-
-    //sla + r
-    TWDR = (DS3231 << 1) | TW_READ;
-    //start transmission
-    TWCR = (1 << TWINT) | (1 << TWEN);
-    while ((TWCR & (1 << TWINT)) == 0) ;
-    if (TW_STATUS == TW_MR_DATA_ACK)
-        ;
-    
     //read seconds
-    TWCR = (1 << TWINT) | (1 << TWEN) | (1<<TWEA);
-	while ((TWCR & (1 << TWINT)) == 0) ;
+    data = twi_read(more);
 
     //read minutes
-    TWCR = (1 << TWINT) | (1 << TWEN) |  (1<<TWEA);
-	while ((TWCR & (1 << TWINT)) == 0) ;
+    data = twi_read(more);
         
-    time->minute = ((TWDR >> 4) * 10) + (TWDR & 0xf);
+    time->minute = ((data >> 4) * 10) + (data & 0xf);
     
     //read hours
-    TWCR = (1 << TWINT) | (1 << TWEN);
-	while ((TWCR & (1 << TWINT)) == 0) ;
+    data = twi_read(finished);
 	
-	time->hour = TWDR & 0xf;
+	time->hour = data & 0xf;
 
-    
-    //stop
-    TWCR = (1 << TWINT) | (1 << TWSTO) | (1 <<TWEN);
-    while ((TWCR & (1 << TWSTO)) == 0) ;
-    
+    twi_stop();    
 }
 
 

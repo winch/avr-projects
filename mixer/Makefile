@@ -13,6 +13,10 @@ hex: main
 upload: hex
 	avrdude -c usbtiny -p t2313 -U flash:w:main.hex:i
 
+.PHONY: fuse
+fuse:
+	avrdude -c usbtiny -p t2313 -U lfuse:w:0x64:m -U hfuse:w:0xdf:m -U efuse:w:0xff:m
+
 .PHONY: clean
 clean:
 	rm -f *.o main main.hex

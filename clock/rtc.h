@@ -6,6 +6,7 @@ struct rtc_time
 {
   char hour;
   char minute;
+  char second;
 };
 
 void rtc_init(struct rtc_time *time);

@@ -58,7 +58,7 @@ int twi_start_write(uint8_t address)
 
 uint8_t twi_read(enum twi_read_mode mode)
 {
-    if (mode == more)
+    if (mode == MORE)
         TWCR = (1 << TWINT) | (1 << TWEN) | (1<<TWEA);
     else
         TWCR = (1 << TWINT) | (1 << TWEN);

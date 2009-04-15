@@ -17,9 +17,9 @@ void serial_init()
     UBRR0L = BAUD_PRESCALE;
     UBRR0H = (BAUD_PRESCALE >> 8);
     //turn on interrupt
-    //UCSR0B |= (1 << RXCIE0);
+    UCSR0B |= (1 << RXCIE0);
     //enable global interupts
-    //sei();
+    sei();
 }
 
 void serial_write(uint8_t data)
@@ -28,10 +28,11 @@ void serial_write(uint8_t data)
     UDR0 = data;
 }
 
-ISR(USART0_RXC_vect)
+
+ISR(USART_RX_vect)
 {
    //recieved byte
    rx_data = UDR0;
    //serial_write(data);
-} 
+}
 

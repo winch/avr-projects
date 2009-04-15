@@ -2,7 +2,7 @@
 #ifndef _TWI_H
 #define _TWI_H
 
-enum twi_read_mode {more, finished};
+enum twi_read_mode {MORE, FINISHED};
 
 void twi_init();
 

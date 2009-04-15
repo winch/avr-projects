@@ -22,6 +22,9 @@ int main(void)
         serial_write('H');
         serial_write('6');
         serial_write('>');
+        serial_write('0' + time.second / 10);
+        serial_write('0' + time.second - ((time.second / 10) * 10));
+        serial_write(10);
         
         display_set(time.hour / 10, time.hour - ((time.hour / 10) * 10), time.minute / 10, time.minute - ((time.minute / 10) * 10));
         

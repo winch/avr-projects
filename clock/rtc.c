@@ -28,14 +28,15 @@ void rtc_read(struct rtc_time *time)
     twi_start_read(DS3231);
 
     //read seconds
-    data = twi_read(more);
+    data = twi_read(MORE);
+    time->second = ((data >> 4) * 10) + (data & 0xf);
 
     //read minutes
-    data = twi_read(more);  
+    data = twi_read(MORE);  
     time->minute = ((data >> 4) * 10) + (data & 0xf);
     
     //read hours
-    data = twi_read(finished);
+    data = twi_read(FINISHED);
     time->hour = data & 0xf;
 
     twi_stop();    

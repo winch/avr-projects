@@ -4,12 +4,15 @@
 
 struct rtc_time
 {
-  char hour;
-  char minute;
-  char second;
+    uint8_t year;
+    uint8_t month;
+    uint8_t day;
+    uint8_t hour;
+    uint8_t minute;
+    uint8_t second;
 };
 
-void rtc_init(struct rtc_time *time);
+void rtc_init();
 
 void rtc_read(struct rtc_time *time);
 

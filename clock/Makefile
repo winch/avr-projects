@@ -13,6 +13,8 @@ display.o: display_values.h
 
 rtc.o: twi.h rtc.h
 
+serial.o: rtc.h
+
 main.hex: main
 	avr-objcopy -O ihex -R .flash $< $<.hex
 

@@ -7,13 +7,9 @@
 //rtc chip address
 #define DS3231 0x68
 
-void rtc_init(struct rtc_time *time)
+void rtc_init()
 {
     twi_init();
-    
-    //time
-    time->hour = 7;
-    time->minute = 8;
 }
 
 void rtc_read(struct rtc_time *time)
@@ -36,8 +32,23 @@ void rtc_read(struct rtc_time *time)
     time->minute = ((data >> 4) * 10) + (data & 0xf);
     
     //read hours
-    data = twi_read(FINISHED);
+    data = twi_read(MORE);
     time->hour = data & 0xf;
+    
+    //weekday number
+    data = twi_read(MORE);
+    
+    //day
+    data = twi_read(MORE);
+    time->day = ((data >> 4) * 10) + (data & 0xf);
+    
+    //month
+    data = twi_read(MORE);
+    time->month = ((data >> 4) * 10) + (data & 0xf);
+    
+    //year
+    data = twi_read(FINISHED);
+    time->day = ((data >> 4) * 10) + (data & 0xf);
 
     twi_stop();    
 }

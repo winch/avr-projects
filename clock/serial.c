@@ -2,6 +2,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "rtc.h"
 
@@ -82,6 +83,45 @@ static void serial_print_time()
     serial_write_string(command_data);
 }
 
+//write the time recieved in command_data to rtc
+static void serial_write_time()
+{
+    //yyyy-mm-dd hh:mm:ss
+    char *data;
+    //seconds
+    data = command_data + 17;
+    time.second = atoi(data);
+    
+    //minutes
+    command_data[16] = 0;
+    data = command_data + 14;
+    time.minute = atoi(data);
+    
+    //hours
+    command_data[13] = 0;
+    data = command_data + 11;
+    time.hour = atoi(data);
+    
+    //day
+    command_data[10] = 0;
+    data = command_data + 8;
+    time.day = atoi(data);
+    
+    //month
+    command_data[7] = 0;
+    data = command_data + 5;
+    time.month = atoi(data);
+    
+    //year
+    command_data[4] = 0;
+    data = command_data + 2;
+    time.year = atoi(data);
+
+    rtc_write(&time);
+    //print the set time
+    serial_print_time();
+}
+
 ISR(USART_RX_vect)
 {
     //recieved byte
@@ -99,6 +139,16 @@ ISR(USART_RX_vect)
             if (command == COMMAND_PRINT)
             {
                 serial_print_time();
+            }
+            else if (command == COMMAND_SET)
+            {
+                serial_write_time();
+            }
+            else
+            {
+                //bad command
+                snprintf(command_data, COMMAND_LEN, "bad c %c\n", command);
+                serial_write_string(command_data);
             }
             command_data[0] = 0;
             command = COMMAND_NONE;

@@ -89,11 +89,11 @@ void rtc_write(struct rtc_time *time)
     //week day
     twi_write(0);
     //day
-    twi_write(time->day);
+    twi_write(value_to_bcd(time->day));
     //month
-    twi_write(time->month);
+    twi_write(value_to_bcd(time->month));
     //year
-    twi_write(time->year);
+    twi_write(value_to_bcd(time->year));
        
     twi_stop();
 }

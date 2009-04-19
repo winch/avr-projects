@@ -10,6 +10,7 @@ struct rtc_time
     uint8_t hour;
     uint8_t minute;
     uint8_t second;
+    char period;
 };
 
 void rtc_init();

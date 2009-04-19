@@ -18,8 +18,8 @@
 //end command
 #define COMMAND_END '|'
 //maximum length of command data
-//yyyy-mm-dd hh:mm:ss|
-#define COMMAND_LEN 21
+//yyyy-mm-dd hh:mm:ssp|
+#define COMMAND_LEN 22
 
 static struct rtc_time time;
 static volatile char command = COMMAND_NONE;
@@ -79,16 +79,21 @@ static void append_command_data(char data)
 static void serial_print_time()
 {
     rtc_read(&time);
-    snprintf(command_data, COMMAND_LEN, "20%.2d-%.2d-%.2d %.2d:%.2d:%.2d\n", time.year, time.month, time.day, time.hour, time.minute, time.second);
+    snprintf(command_data, COMMAND_LEN, "20%.2d-%.2d-%.2d %.2d:%.2d:%.2d%c\n", time.year, time.month, time.day, time.hour, time.minute, \
+                time.second, time.period);
     serial_write_string(command_data);
 }
 
 //write the time recieved in command_data to rtc
 static void serial_write_time()
 {
-    //yyyy-mm-dd hh:mm:ss
+    //yyyy-mm-dd hh:mm:ssp
     char *data;
+    //period
+    time.period = command_data[19];
+    
     //seconds
+    command_data[19] = 0;
     data = command_data + 17;
     time.second = atoi(data);
     

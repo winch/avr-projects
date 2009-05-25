@@ -9,6 +9,8 @@ int main(void)
 {
     struct rtc_time time;
     
+    int rtc_count = 21;
+    
     display_init();
     display_test();
     
@@ -17,11 +19,17 @@ int main(void)
     
     while(1)
     {
-        rtc_read(&time);
+        if (rtc_count > 20)
+        {
+            rtc_count = 0;
+            rtc_read(&time);
+            display_set(time.hour / 10, time.hour - ((time.hour / 10) * 10), time.minute / 10, time.minute - ((time.minute / 10) * 10));
+        }
         
-        display_set(time.hour / 10, time.hour - ((time.hour / 10) * 10), time.minute / 10, time.minute - ((time.minute / 10) * 10));
+        serial_do_command();
         
-        _delay_ms(10000);
+        rtc_count ++;
+        _delay_ms(500);
     }
    
     return 0;

@@ -23,6 +23,7 @@
 
 static struct rtc_time time;
 static volatile char command = COMMAND_NONE;
+static volatile char command_status = COMMAND_NONE;
 static volatile char command_data[COMMAND_LEN + 1] = "";
 
 void serial_init()
@@ -57,7 +58,7 @@ void serial_write_string(char *data)
     }
 }
 
-//appends to command_data
+//appends character to command_data
 static void append_command_data(char data)
 {
     size_t len = strlen(command_data);
@@ -66,7 +67,7 @@ static void append_command_data(char data)
     {
         command_data[0] = 0;
         command = COMMAND_NONE;
-        serial_write_string("cdata over\n");
+        serial_write_string(" cd over\n");
     }
     else
     {
@@ -76,6 +77,7 @@ static void append_command_data(char data)
     }
 }
 
+//read the time from rtc and write it to serial
 static void serial_print_time()
 {
     rtc_read(&time);
@@ -127,10 +129,41 @@ static void serial_write_time()
     serial_print_time();
 }
 
+void serial_do_command()
+{
+    if (command_status == COMMAND_END)
+    {
+        //perform command
+        if (command == COMMAND_PRINT)
+        {
+            serial_print_time();
+        }
+        else if (command == COMMAND_SET)
+        {
+            serial_write_string(" set\n");
+        }
+        else
+        {
+            //bad command
+            snprintf(command_data, COMMAND_LEN, "bad c %c\n", command);
+            serial_write_string(command_data);
+        }
+        
+        command_status = COMMAND_NONE;
+        command_data[0] = 0;
+        command = COMMAND_NONE;
+    }
+}
+
 ISR(USART_RX_vect)
 {
     //recieved byte
     uint8_t rx_data = UDR0;
+    
+    if (command_status != COMMAND_NONE)
+    {
+        return;
+    }
 
     if (command == COMMAND_NONE)
     {
@@ -140,23 +173,8 @@ ISR(USART_RX_vect)
     {
         if (rx_data == COMMAND_END)
         {
-            //end of command data, perform command
-            if (command == COMMAND_PRINT)
-            {
-                serial_print_time();
-            }
-            else if (command == COMMAND_SET)
-            {
-                serial_write_time();
-            }
-            else
-            {
-                //bad command
-                snprintf(command_data, COMMAND_LEN, "bad c %c\n", command);
-                serial_write_string(command_data);
-            }
-            command_data[0] = 0;
-            command = COMMAND_NONE;
+            //command ready to be perfomed
+            command_status = COMMAND_END;
         }
         else
         {

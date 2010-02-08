@@ -12,13 +12,13 @@ void led_init()
     LED_DDR |= (1 << LED_PIN);
 }
 
-void led_on()
+static void led_on()
 {
     //turn led on
     LED_PORT |= (1 << LED_PIN); 
 }
 
-void led_off()
+static void led_off()
 {
     //turn led off
     LED_PORT &= ~(1 << LED_PIN); 

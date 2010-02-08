@@ -1,9 +1,9 @@
 
 CC = avr-gcc
 
-CFLAGS = -Wall -Os -g -w -mmcu=atmega168 -DF_CPU=1000000L
+CFLAGS = -Wall -Os -g -w -mmcu=atmega168 -DF_CPU=1000000L -ffunction-sections -fdata-sections -lm
 
-LDLIBS = -Os -mmcu=atmega168
+LDLIBS = -Os -mmcu=atmega168 --relax --gc-sections -lm
 
 main: main.o display.o rtc.o twi.o serial.o
 

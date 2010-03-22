@@ -1,0 +1,13 @@
+Atmel AVR Projects
+==================
+
+Clock
+-----
+
+Simple clock project
+
+Mixer
+-----
+
+Source code for mixer, see
+http://winch.pinkbile.com/wiki/index.php/Main/Mixer
